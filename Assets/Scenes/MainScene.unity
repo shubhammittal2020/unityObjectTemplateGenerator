@@ -588,7 +588,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &603724533
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1800,7 +1800,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 150412752}
-  sprite: {fileID: 21300000, guid: 91fae1e9391c0724397debe049865eb2, type: 3}
+  sampleImage: {fileID: 2800000, guid: 91fae1e9391c0724397debe049865eb2, type: 3}
 --- !u!4 &1903991135
 Transform:
   m_ObjectHideFlags: 0
