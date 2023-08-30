@@ -8,14 +8,16 @@ using UnityEngine.UIElements.Experimental;
 
 public class ImageTemplate {
     public string name;
+    public Transform parent; 
     public Vector3 position;
     public Quaternion rotation;
     public Texture texture;
 
     //public ImageTemplate() { }
 
-    public ImageTemplate(string name, Vector3 position, Quaternion rotation, Texture texture) { 
+    public ImageTemplate(string name, Transform parent, Vector3 position, Quaternion rotation, Texture texture) { 
         this.name = name;
+        this.parent = parent;
         this.position = position;
         this.rotation = rotation;
         this.texture = texture;
@@ -24,6 +26,7 @@ public class ImageTemplate {
 
 public class TextTemplate {
     public string name;
+    public Transform parent;
     public Vector3 position;
     public Quaternion rotation;
     public string text;
@@ -31,8 +34,9 @@ public class TextTemplate {
 
     //public TextTemplate() { }
 
-    public TextTemplate(string name, Vector3 position, Quaternion rotation, string text, Color textColor) {
+    public TextTemplate(string name, Transform parent, Vector3 position, Quaternion rotation, string text, Color textColor) {
         this.name = name;
+        this.parent = parent;
         this.position = position;
         this.rotation = rotation;
         this.text = text;
@@ -44,11 +48,11 @@ public class TemplateManager : MonoBehaviour {
 
     public static TemplateManager Instance;
 
-    [SerializeField] Transform parent;
+    [SerializeField] Transform manualParent;
     [SerializeField] Texture sampleImage;
 
-    ImageTemplate image1 = new ImageTemplate(string.Empty, Vector3.zero, Quaternion.identity, null);
-    TextTemplate text1 = new TextTemplate(string.Empty, Vector3.zero, Quaternion.identity, "", Color.black);
+    ImageTemplate image1 = new ImageTemplate(string.Empty, null, Vector3.zero, Quaternion.identity, null);
+    TextTemplate text1 = new TextTemplate(string.Empty, null, Vector3.zero, Quaternion.identity, "", Color.black);
 
     void Start() {
         SetImageData(image1);
@@ -64,6 +68,8 @@ public class TemplateManager : MonoBehaviour {
         // Manually assigning all values
         image.name = "SampleImageTemplate";
 
+        image.parent = manualParent.transform;
+
         image.position = Vector3.zero;
         image.rotation = Quaternion.identity;
 
@@ -78,7 +84,7 @@ public class TemplateManager : MonoBehaviour {
         obj.AddComponent<RectTransform>();
 
         // Set Parent
-        obj.GetComponent<RectTransform>().SetParent(parent);
+        obj.GetComponent<RectTransform>().SetParent(image.parent);
 
         // Set Transform
         obj.GetComponent<RectTransform>().localPosition = image.position;
@@ -100,6 +106,8 @@ public class TemplateManager : MonoBehaviour {
         // Manually assigning all values
         myText.name = "SampleTextTemplate";
 
+        myText.parent = manualParent.transform;
+
         myText.position = Vector3.zero;
         myText.rotation = Quaternion.identity;
 
@@ -114,7 +122,7 @@ public class TemplateManager : MonoBehaviour {
         obj.AddComponent<RectTransform>();
 
         // Set Parent
-        obj.GetComponent<RectTransform>().SetParent(parent);
+        obj.GetComponent<RectTransform>().SetParent(myText.parent);
 
         // Set Transform
         obj.GetComponent<RectTransform>().localPosition = myText.position;

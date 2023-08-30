@@ -1799,7 +1799,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5011762029831bb45a488ce193aae354, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  parent: {fileID: 150412752}
+  manualParent: {fileID: 150412752}
   sampleImage: {fileID: 2800000, guid: 91fae1e9391c0724397debe049865eb2, type: 3}
 --- !u!4 &1903991135
 Transform:
