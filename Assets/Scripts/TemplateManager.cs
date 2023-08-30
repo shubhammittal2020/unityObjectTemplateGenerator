@@ -51,12 +51,11 @@ public class TemplateManager : MonoBehaviour {
     TextTemplate text1 = new TextTemplate(string.Empty, Vector3.zero, Quaternion.identity, "", Color.black);
 
     void Start() {
-
         SetImageData(image1);
         SetTextData(text1);
 
-        CreateSampleImage(GetImageData(image1));
-        CreateSampleText(GetTextData(text1));
+        GetImageData(image1);
+        GetTextData(text1);
     }
 
     #region Image Template
@@ -71,28 +70,26 @@ public class TemplateManager : MonoBehaviour {
         image.texture = sampleImage;
     }
 
-    GameObject GetImageData(ImageTemplate image) {
+    void GetImageData(ImageTemplate image) {
         GameObject obj = new GameObject(image.name);
+
 
         // Add RectTransform
         obj.AddComponent<RectTransform>();
 
+        // Set Parent
+        obj.GetComponent<RectTransform>().SetParent(parent);
+
         // Set Transform
         obj.GetComponent<RectTransform>().localPosition = image.position;
         obj.GetComponent<RectTransform>().localRotation = image.rotation;
+        obj.GetComponent<RectTransform>().localScale = Vector3.one;
 
         // Attach Image
         obj.AddComponent<RawImage>();
 
         // Set Image
         obj.GetComponent<RawImage>().texture = image.texture;
-
-        return obj;
-    }
-
-    void CreateSampleImage(GameObject obj) {  
-        obj.GetComponent<RectTransform>().SetParent(parent);
-        obj.GetComponent<RectTransform>().localScale = Vector3.one;
     }
 
     #endregion
@@ -110,31 +107,28 @@ public class TemplateManager : MonoBehaviour {
         myText.textColor = Color.black;
     }
 
-    GameObject GetTextData(TextTemplate myText) {
+    void GetTextData(TextTemplate myText) {
         GameObject obj = new GameObject(myText.name);
 
         // Add RectTransform
         obj.AddComponent<RectTransform>();
 
+        // Set Parent
+        obj.GetComponent<RectTransform>().SetParent(parent);
+
         // Set Transform
         obj.GetComponent<RectTransform>().localPosition = myText.position;
         obj.GetComponent<RectTransform>().localRotation = myText.rotation;
+        obj.GetComponent<RectTransform>().localScale = Vector3.one;
 
         // Add TextMeshProUGUI
         obj.AddComponent<TextMeshProUGUI>();
 
-        // Set Text
+        // Set Text Elements
         obj.GetComponent<TextMeshProUGUI>().text = myText.text;
         obj.GetComponent<TextMeshProUGUI>().enableAutoSizing = true;
         obj.GetComponent<TextMeshProUGUI>().color = myText.textColor;
         obj.GetComponent<TextMeshProUGUI>().alignment = TextAlignmentOptions.Center;
-
-        return obj;
-    }
-
-    void CreateSampleText(GameObject obj) {
-        obj.GetComponent<RectTransform>().SetParent(parent);
-        obj.GetComponent<RectTransform>().localScale = Vector3.one;
     }
 
     #endregion
