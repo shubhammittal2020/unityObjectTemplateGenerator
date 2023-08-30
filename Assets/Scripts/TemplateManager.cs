@@ -71,11 +71,6 @@ public class TemplateManager : MonoBehaviour {
         image.texture = sampleImage;
     }
 
-
-    void CreateSampleImage(GameObject obj) {  
-        obj.GetComponent<RectTransform>().SetParent(parent);
-    }
-
     GameObject GetImageData(ImageTemplate image) {
         GameObject obj = new GameObject(image.name);
 
@@ -85,7 +80,6 @@ public class TemplateManager : MonoBehaviour {
         // Set Transform
         obj.GetComponent<RectTransform>().localPosition = image.position;
         obj.GetComponent<RectTransform>().localRotation = image.rotation;
-        obj.GetComponent<RectTransform>().localScale = Vector3.one;
 
         // Attach Image
         obj.AddComponent<RawImage>();
@@ -94,6 +88,11 @@ public class TemplateManager : MonoBehaviour {
         obj.GetComponent<RawImage>().texture = image.texture;
 
         return obj;
+    }
+
+    void CreateSampleImage(GameObject obj) {  
+        obj.GetComponent<RectTransform>().SetParent(parent);
+        obj.GetComponent<RectTransform>().localScale = Vector3.one;
     }
 
     #endregion
@@ -120,7 +119,6 @@ public class TemplateManager : MonoBehaviour {
         // Set Transform
         obj.GetComponent<RectTransform>().localPosition = myText.position;
         obj.GetComponent<RectTransform>().localRotation = myText.rotation;
-        obj.GetComponent<RectTransform>().localScale = Vector3.one;
 
         // Add TextMeshProUGUI
         obj.AddComponent<TextMeshProUGUI>();
@@ -136,6 +134,7 @@ public class TemplateManager : MonoBehaviour {
 
     void CreateSampleText(GameObject obj) {
         obj.GetComponent<RectTransform>().SetParent(parent);
+        obj.GetComponent<RectTransform>().localScale = Vector3.one;
     }
 
     #endregion
