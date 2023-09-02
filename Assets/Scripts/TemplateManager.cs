@@ -1,144 +1,348 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.UIElements;
 using TMPro;
-using UnityEngine.UIElements.Experimental;
+using Newtonsoft.Json;
+using UnityEngine.EventSystems;
+using Unity.VisualScripting;
 
-public class ImageTemplate {
-    public string name;
-    public Transform parent; 
-    public Vector3 position;
-    public Quaternion rotation;
-    public Texture texture;
+//public class Positions {
+//    public float x { get; set; }
+//    public float y { get; set; }
+//    public float z { get; set; }
+//}
 
-    //public ImageTemplate() { }
+//public class Rotations {
+//    public float a { get; set; }
+//    public float b { get; set; }
+//    public float c { get; set; }
+//    public float w { get; set; }
+//}
 
-    public ImageTemplate(string name, Transform parent, Vector3 position, Quaternion rotation, Texture texture) { 
-        this.name = name;
-        this.parent = parent;
-        this.position = position;
-        this.rotation = rotation;
-        this.texture = texture;
-    }
-}
+//public class ImageTemplate {
+//    public string name;
+//    public Transform parent;
 
-public class TextTemplate {
-    public string name;
-    public Transform parent;
-    public Vector3 position;
-    public Quaternion rotation;
-    public string text;
-    public Color textColor;
+//    public float parentPosX;
+//    public float parentPosY;
+//    public float parentPosZ;
 
-    //public TextTemplate() { }
+//    public float posX;
+//    public float posY;
+//    public float posZ;
+    
+//    public float rotX;
+//    public float rotY;
+//    public float rotZ;
+//    public float rotW;
 
-    public TextTemplate(string name, Transform parent, Vector3 position, Quaternion rotation, string text, Color textColor) {
-        this.name = name;
-        this.parent = parent;
-        this.position = position;
-        this.rotation = rotation;
-        this.text = text;
-        this.textColor = textColor;
-    }
-}
+//    //public Texture texture;
+
+//    //public ImageTemplate() { }
+
+//    public ImageTemplate(string name, Transform parent, float a, float b, float c, float x, float y, float z, float t, float u, float v, float w) { 
+//        this.name = name;
+//        this.parent = parent;
+
+//        this.parentPosX = a;
+//        this.parentPosY = b; 
+//        this.parentPosZ = c;
+        
+//        this.posX = x;
+//        this.posY = y; 
+//        this.posZ = z;
+        
+//        this.rotX = t;
+//        this.rotY = u;
+//        this.rotZ = v;
+//        this.rotZ = w;
+
+//        //this.texture = texture;
+//    }
+//}
+
+//public class TextTemplate {
+//    public string name;
+//    public Transform parent;
+
+//    public float x;
+//    public float y;
+//    public float z;
+
+//    public float a;
+//    public float b;
+//    public float c;
+//    public float w;
+
+//    public string text;
+//    public Color textColor;
+
+//    //public TextTemplate() { }
+
+//    public TextTemplate(string name, float x, float y, float z, float a, float b, float c, float w, string text, Color textColor) {
+//        this.name = name;
+        
+//        //this.parent = parent;
+
+//        this.x = x;
+//        this.y = y;
+//        this.z = z;
+
+//        this.a = a;
+//        this.b = b;
+//        this.c = c;
+//        this.w = w;
+
+//        this.text = text;
+//        this.textColor = textColor;
+//    }
+//}
 
 public class TemplateManager : MonoBehaviour {
 
-    public static TemplateManager Instance;
+    new Camera camera;
 
-    [SerializeField] Transform manualParent;
-    [SerializeField] Texture sampleImage;
+    [SerializeField] Texture2D adLogo;
+    [SerializeField] Texture2D appLogo;
+    [SerializeField] string appName;
+    [SerializeField] Texture2D starFilled;
+    [SerializeField] Texture2D starEmpty;
+    [SerializeField] int starCount;
+    [SerializeField] int totalStars;
+    [SerializeField] string price;
+    [SerializeField] string description;
+    [SerializeField] string buttonColor;
+    [SerializeField] string buttonText;
+    
 
-    ImageTemplate image1 = new ImageTemplate(string.Empty, null, Vector3.zero, Quaternion.identity, null);
-    TextTemplate text1 = new TextTemplate(string.Empty, null, Vector3.zero, Quaternion.identity, "", Color.black);
+    private void Awake() {
+        camera = Camera.main;
+    }
 
     void Start() {
-        SetImageData(image1);
-        SetTextData(text1);
-
-        GetImageData(image1);
-        GetTextData(text1);
+        CreateHolder(CreateCanvas());
     }
 
-    #region Image Template
+    RectTransform CreateCanvas() {
+        CreateEventSystem();
 
-    void SetImageData(ImageTemplate image) {
-        // Manually assigning all values
-        image.name = "SampleImageTemplate";
+        GameObject obj = new GameObject("Canvas");
 
-        image.parent = manualParent.transform;
+        obj.AddComponent<RectTransform>();
+        obj.AddComponent<Canvas>();
+        obj.AddComponent<CanvasScaler>();
+        obj.AddComponent<GraphicRaycaster>();
 
-        image.position = Vector3.zero;
-        image.rotation = Quaternion.identity;
+        Canvas canvas = obj.GetComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceCamera;
+        canvas.worldCamera = camera;
+        canvas.planeDistance = 100;
 
-        image.texture = sampleImage;
+        CanvasScaler canvasScaler = obj.GetComponent<CanvasScaler>();
+        canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        canvasScaler.referenceResolution = new Vector2(1080, 1920);
+        canvasScaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+        canvasScaler.matchWidthOrHeight = 1;
+        canvasScaler.referencePixelsPerUnit = 100;
+
+        GraphicRaycaster graphicRaycaster = obj.GetComponent<GraphicRaycaster>();
+        graphicRaycaster.ignoreReversedGraphics = true;
+
+        return obj.GetComponent<RectTransform>();
     }
 
-    void GetImageData(ImageTemplate image) {
-        GameObject obj = new GameObject(image.name);
+    void CreateEventSystem() {
+        if (EventSystem.current != null) return;
 
+        GameObject obj = new GameObject("Event System");
 
+        obj.AddComponent<EventSystem>();
+        obj.AddComponent<StandaloneInputModule>();
+    }
+
+    void CreateHolder(RectTransform myTransform) {
+        RectTransform holderTransform = AddChildInHierarchy("Holder", myTransform);
+
+        // Set position and size
+        holderTransform.localPosition = Vector3.zero;
+        holderTransform.sizeDelta = new Vector2(500, 300);
+
+        holderTransform.gameObject.AddComponent<Image>();
+
+        AddAdLogo(holderTransform);
+        AddAdData(holderTransform);
+    }
+
+    void AddAdLogo(RectTransform myTransform) {
+        RectTransform childTransform = AddChildInHierarchy("adTagHolder", myTransform);
+
+        // Set position and size
+        childTransform.localPosition = new Vector3(-225, 130, 0);
+        childTransform.sizeDelta = new Vector2(40, 20);
+
+        CreateImage("RawImage_adChoiceTag", childTransform, 0, 0, 0, 40, 20, adLogo);
+    }
+
+    void AddAdData(RectTransform myTransform) {
+        RectTransform childTransform = AddChildInHierarchy("Padding", myTransform);
+
+        // Set position and size
+        childTransform.localPosition = new Vector3(0, 15, 0);
+        childTransform.sizeDelta = new Vector2(500, 200);
+
+        AddAdDetails(childTransform);
+        GetTextData("TextBody", childTransform, 0, -55, 0, 490, 75, description, true, Color.black, TextAlignmentOptions.Left);
+        AddInstallButton("InstallButton", "Text_CallToAction", buttonText, childTransform);
+    }
+
+    void AddAdDetails(RectTransform myTransform) {
+        RectTransform childTransform = AddChildInHierarchy("AppDetail", myTransform);
+
+        // Set position and size
+        childTransform.localPosition = new Vector3(0, 40, 0);
+        childTransform.sizeDelta = new Vector2(500, 120);
+
+        DrawAdLogo(childTransform);
+        FillAdDetails(childTransform);
+    }
+
+    void DrawAdLogo(RectTransform myTransform) {
+        RectTransform childTransform = AddChildInHierarchy("AppIconHolder", myTransform);
+
+        // Set position and size
+        childTransform.localPosition = new Vector3(-195, 0, 0);
+        childTransform.sizeDelta = new Vector2(100, 100);
+
+        CreateImage("RawImage_adIcon", childTransform, 0, 0, 0, 100, 100, appLogo);
+    }
+
+    void FillAdDetails(RectTransform myTransform) {
+        RectTransform childTransform = AddChildInHierarchy("AppInfo", myTransform);
+
+        // Set position and size
+        childTransform.localPosition = new Vector3(50, 0, 0);
+        childTransform.sizeDelta = new Vector2(380, 100);
+
+        GetTextData("Text_adHeadline", childTransform, 0, 30, 0, 380, 40, appName, true, Color.black, TextAlignmentOptions.Left);
+
+        RectTransform child2Transform = AddChildInHierarchy("StarRating", childTransform);
+
+        // Set position and size
+        child2Transform.localPosition = new Vector3(0, -6.5f, 0);
+        child2Transform.sizeDelta = new Vector2(385, 25);
+
+        for (int i = 0; i < starCount; i++) {
+            CreateImage("Star" + (i+1).ToString(), child2Transform, -185 + (i * 15), 0, 0, 15, 15, starFilled);
+        }
+        for (int i = starCount; i < totalStars; i++) {
+            CreateImage("Star" + (i+1).ToString(), child2Transform, -185 + (i * 15), 0, 0, 15, 15, starEmpty);
+        }
+
+        GetTextData("priceText", childTransform, 0, -35, 0, 380, 25, price, true, Color.black, TextAlignmentOptions.Left);
+    }
+
+    RectTransform AddChildInHierarchy(string name, RectTransform myTransform) {
+        GameObject obj = new GameObject(name);
+
+        // Add RectTransform
+        obj.AddComponent<RectTransform>();
+        RectTransform rect = obj.GetComponent<RectTransform>();
+
+        // Local Local & Set Parent
+        RectTransform localRect = rect;
+        rect.SetParent(myTransform);
+
+        // Set Transform
+        rect.localPosition = new Vector3(localRect.localPosition.x, localRect.localPosition.x, localRect.localPosition.x);
+        rect.localRotation = new Quaternion(localRect.localRotation.x, localRect.localRotation.y, localRect.localRotation.z, localRect.localRotation.w);
+        rect.localScale = Vector3.one;
+
+        return rect;
+    }
+
+    void OnButtonClicked() {
+        Debug.LogError("Clicked on install button");  //Redirect to application
+    }
+
+    void CreateImage(string name, RectTransform parent, float posX, float posY, float posZ, float width, float height, Texture2D imagetexture) {
+        GameObject obj = new GameObject(name);
+
+        
         // Add RectTransform
         obj.AddComponent<RectTransform>();
 
         // Set Parent
-        obj.GetComponent<RectTransform>().SetParent(image.parent);
+        obj.GetComponent<RectTransform>().SetParent(parent);
 
         // Set Transform
-        obj.GetComponent<RectTransform>().localPosition = image.position;
-        obj.GetComponent<RectTransform>().localRotation = image.rotation;
+        obj.GetComponent<RectTransform>().localPosition = new Vector3(posX, posY, posZ);
+        obj.GetComponent<RectTransform>().sizeDelta = new Vector2(width, height);
+        obj.GetComponent<RectTransform>().localRotation = new Quaternion(0, 0, 0, 0);
         obj.GetComponent<RectTransform>().localScale = Vector3.one;
 
         // Attach Image
         obj.AddComponent<RawImage>();
 
         // Set Image
-        obj.GetComponent<RawImage>().texture = image.texture;
+        obj.GetComponent<RawImage>().texture = imagetexture;
     }
 
-    #endregion
-
-    #region Text Template
-
-    void SetTextData(TextTemplate myText) {
-        // Manually assigning all values
-        myText.name = "SampleTextTemplate";
-
-        myText.parent = manualParent.transform;
-
-        myText.position = Vector3.zero;
-        myText.rotation = Quaternion.identity;
-
-        myText.text = "This is the sample Text";
-        myText.textColor = Color.black;
-    }
-
-    void GetTextData(TextTemplate myText) {
-        GameObject obj = new GameObject(myText.name);
+    void GetTextData(string name, RectTransform parent, float posX, float posY, float posZ, float width, float height, string text, bool autoSize, Color color, TextAlignmentOptions alignmentOption) {
+        GameObject obj = new GameObject(name);
 
         // Add RectTransform
         obj.AddComponent<RectTransform>();
 
         // Set Parent
-        obj.GetComponent<RectTransform>().SetParent(myText.parent);
+        obj.GetComponent<RectTransform>().SetParent(parent);
 
         // Set Transform
-        obj.GetComponent<RectTransform>().localPosition = myText.position;
-        obj.GetComponent<RectTransform>().localRotation = myText.rotation;
+        obj.GetComponent<RectTransform>().localPosition = new Vector3(posX, posY, posZ);
+        obj.GetComponent<RectTransform>().localRotation = new Quaternion(0, 0, 0, 0);
         obj.GetComponent<RectTransform>().localScale = Vector3.one;
+        obj.GetComponent<RectTransform>().sizeDelta = new Vector2(width, height);
+
 
         // Add TextMeshProUGUI
         obj.AddComponent<TextMeshProUGUI>();
 
         // Set Text Elements
-        obj.GetComponent<TextMeshProUGUI>().text = myText.text;
-        obj.GetComponent<TextMeshProUGUI>().enableAutoSizing = true;
-        obj.GetComponent<TextMeshProUGUI>().color = myText.textColor;
-        obj.GetComponent<TextMeshProUGUI>().alignment = TextAlignmentOptions.Center;
+        obj.GetComponent<TextMeshProUGUI>().text = text;
+        obj.GetComponent<TextMeshProUGUI>().enableAutoSizing = autoSize;
+        obj.GetComponent<TextMeshProUGUI>().color = color;
+        obj.GetComponent<TextMeshProUGUI>().alignment = alignmentOption;
     }
 
-    #endregion
+    void AddInstallButton(string buttonObjName, string textObjName, string text, RectTransform myTransform) {
+        RectTransform buttonTransform = AddChildInHierarchy(buttonObjName, myTransform);
+
+        // Set position and size
+        buttonTransform.localPosition = new Vector3(0, -130, 0);
+        buttonTransform.sizeDelta = new Vector2(480, 50);
+
+        GameObject buttonObj = buttonTransform.gameObject;
+
+        buttonObj.AddComponent<Image>();
+        Color colorFromHex;
+        UnityEngine.ColorUtility.TryParseHtmlString("#2FCCB2", out colorFromHex);
+        buttonObj.GetComponent<Image>().color = colorFromHex;
+
+        buttonObj.AddComponent<Button>();
+        buttonObj.GetComponent<Button>().onClick.AddListener(OnButtonClicked);
+
+        RectTransform TextTransform = AddChildInHierarchy(textObjName, buttonTransform);
+
+        // Set position and size
+        TextTransform.localPosition = new Vector3(0, 0, 0);
+        TextTransform.sizeDelta = new Vector2(460, 40);
+
+        GameObject textObj = TextTransform.gameObject;
+        textObj.AddComponent<TextMeshProUGUI>();
+        textObj.GetComponent<TextMeshProUGUI>().text = text;
+        textObj.GetComponent<TextMeshProUGUI>().color = Color.black;
+        textObj.GetComponent<TextMeshProUGUI>().alignment = TextAlignmentOptions.Center;
+    }
 
 }
