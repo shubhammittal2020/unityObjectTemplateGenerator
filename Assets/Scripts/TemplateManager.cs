@@ -105,15 +105,15 @@ public class AdTemplate {
     public int starRate;
     public string price;
     public string description;
-    public string buttonColor;
+    public string colorCode;
     public string buttonText;
 
-    public AdTemplate(string appName, int starRate, string price, string description, string buttonColor, string buttonText) {
+    public AdTemplate(string appName, int starRate, string price, string description, string colorCode, string buttonText) {
         this.appName = appName;
         this.starRate = starRate;
         this.price = price;
         this.description = description;
-        this.buttonColor = buttonColor;
+        this.colorCode = colorCode;
         this.buttonText = buttonText;
     }
 }
@@ -132,7 +132,7 @@ public class TemplateManager : MonoBehaviour {
     [SerializeField] int totalStars;
     [SerializeField] string price;
     [SerializeField] string description;
-    [SerializeField] string buttonColor;
+    [SerializeField] string colorCode;
     [SerializeField] string buttonText;
     
 
@@ -149,9 +149,11 @@ public class TemplateManager : MonoBehaviour {
     }
 
     void AssignValues() {
-        AdTemplate adTemplate = new AdTemplate(appName, starCount, price, description, buttonColor, buttonText);
+        AdTemplate adTemplate = new AdTemplate(appName, starCount, price, description, colorCode, buttonText);
+        string manualValues = "{\"appName\":\"Test Ad : Flood-It!\",\"starRate\":4,\"price\":\"Free\",\"description\":\"Install Flood-It App for free! Free popular Casual Game\",\"buttonColor\":\"Black\",\"buttonText\":\"Install\"}";
+        //SetValues(JsonConvert.DeserializeObject<AdTemplate>(manualValues));
         SetValues(adTemplate);
-        
+        //Debug.Log(JsonConvert.SerializeObject(adTemplate));
         DisplayAd();
     }
 
@@ -164,7 +166,7 @@ public class TemplateManager : MonoBehaviour {
         starCount = adTemplate.starRate;
         price = adTemplate.price;
         description = adTemplate.description;
-        buttonColor = adTemplate.buttonColor;
+        colorCode = adTemplate.colorCode;
         buttonText = adTemplate.buttonText;
     }
 
@@ -369,7 +371,7 @@ public class TemplateManager : MonoBehaviour {
 
         buttonObj.AddComponent<Image>();
         Color colorFromHex;
-        UnityEngine.ColorUtility.TryParseHtmlString("#2FCCB2", out colorFromHex);
+        UnityEngine.ColorUtility.TryParseHtmlString(colorCode, out colorFromHex);
         buttonObj.GetComponent<Image>().color = colorFromHex;
 
         buttonObj.AddComponent<Button>();
