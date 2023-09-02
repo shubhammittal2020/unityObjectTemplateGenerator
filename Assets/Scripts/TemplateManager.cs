@@ -100,9 +100,28 @@ using Unity.VisualScripting;
 //    }
 //}
 
+public class AdTemplate {
+    public string appName;
+    public int starRate;
+    public string price;
+    public string description;
+    public string buttonColor;
+    public string buttonText;
+
+    public AdTemplate(string appName, int starRate, string price, string description, string buttonColor, string buttonText) {
+        this.appName = appName;
+        this.starRate = starRate;
+        this.price = price;
+        this.description = description;
+        this.buttonColor = buttonColor;
+        this.buttonText = buttonText;
+    }
+}
+
 public class TemplateManager : MonoBehaviour {
 
     new Camera camera;
+    RectTransform parent;
 
     [SerializeField] Texture2D adLogo;
     [SerializeField] Texture2D appLogo;
@@ -122,7 +141,31 @@ public class TemplateManager : MonoBehaviour {
     }
 
     void Start() {
-        CreateHolder(CreateCanvas());
+        parent = CreateCanvas();
+    }
+
+    public void AssignValuesAndDisplayAd() {
+        AssignValues();
+    }
+
+    void AssignValues() {
+        AdTemplate adTemplate = new AdTemplate(appName, starCount, price, description, buttonColor, buttonText);
+        SetValues(adTemplate);
+        
+        DisplayAd();
+    }
+
+    void DisplayAd() {
+        CreateHolder(parent);
+    }
+
+    void SetValues(AdTemplate adTemplate) {
+        appName = adTemplate.appName;
+        starCount = adTemplate.starRate;
+        price = adTemplate.price;
+        description = adTemplate.description;
+        buttonColor = adTemplate.buttonColor;
+        buttonText = adTemplate.buttonText;
     }
 
     RectTransform CreateCanvas() {
